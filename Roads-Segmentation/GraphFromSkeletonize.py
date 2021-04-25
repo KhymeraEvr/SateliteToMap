@@ -43,7 +43,7 @@ class Graph:
                 return pts
 
     def FindPath(self, graph, nodeA,nodeB):
-        path = nx.shortest_path(graph, nodeA, nodeB);
+        path = nx.shortest_path(graph, nodeA, nodeB, weight='weight');
         return path;
 
     def DrawGraph(self, graph):
@@ -69,17 +69,25 @@ class Graph:
 
         # draw edges by pts
         for (s, e) in graph.edges():
+         #   print('s ' + str(s) + ' e ' + str(e))
             ps = graph[s][e]['pts']
             plt.plot(ps[:, 1], ps[:, 0], 'green')
 
         # draw node by o
         nodes = graph.nodes()
+        # for nd in nodes:
+        #    nodePoint = self.FindNodeById(g, nd)
+        #    plt.annotate(nd, (nodePoint[1]['o'][1], nodePoint[1]['o'][0]), color='white')
         ps = np.array([nodes[i]['o'] for i in nodes])
         plt.plot(ps[:, 1], ps[:, 0], 'r.')
+
         pathNodes = []
         for pathNd in path:
             pathPoint = self.FindNodeById(g, pathNd)
             pathNodes.append(pathPoint[1])
+            plt.plot(pathPoint[1]['o'][1], pathPoint[1]['o'][0], 'blue')
+            # plt.annotate(pathPoint[0], (pathPoint[1]['o'][1], pathPoint[1]['o'][0]), color='white')
+
         ps2 = np.array([pathNodes[i]['o'] for i in range(len(pathNodes))])
         plt.plot(ps2[:, 1], ps2[:, 0], 'blue')
 
