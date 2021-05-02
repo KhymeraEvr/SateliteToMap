@@ -1,3 +1,12 @@
 
 Roads-Segmentation/.idea
 Roads-Segmentation/model
+Roads-Segmentation/venv
+Roads-Segmentation/PredictionsFromLoadedModel
+Roads-Segmentation/tensorboard
+
+Roads-Segmentation/Dataset_train.h5
+Roads-Segmentation/Dataset_test.h5
+Roads-Segmentation/weights.h5
+Roads-Segmentation/modelWeights.h5
+Roads-Segmentation/finalModel.hdf5

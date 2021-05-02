@@ -43,8 +43,9 @@ class Graph:
     def GetGraphFromImage(self, imageFileName):
         # open and skeletonize
         filePath = inputImagePath + imageFileName;
-        img = imread(filePath)
-
+        img24bit = imread(filePath)
+        img =  np.array(Image.fromarray(img24bit).quantize(colors=2, method=2))
+        self.Show(img)
 
         binary = img > filters.threshold_otsu(img,100)
 
@@ -161,12 +162,12 @@ class Graph:
         # plt.show()
 
 serv = Graph()
-g = serv.GetGraphFromImage("outMed.jpg")
+g = serv.GetGraphFromImage("34_pred.png")
 serv.DrawGraph(g);
 
-node1 = serv.FindNodeByXY(g, 385, 231)[0]
+node1 = serv.FindNodeByXY(g, 36, 27)[0]
 print("point1 = " +str(node1))
-node2 = serv.FindNodeByXY(g, 907, 404)[0]
+node2 = serv.FindNodeByXY(g, 229, 220)[0]
 print("point2 = " +str(node2))
 path = serv.FindPath(g,node1[0],node2[0])
 serv.DrawPath(g,path)
