@@ -1,7 +1,8 @@
 import numpy as np
 import cv2
 
-inputFolder = 'SegmentRemoval/Input/'
+#inputFolder = 'SegmentRemoval/Input/'
+inputFolder = 'Predictions/output/'
 ClosingFolder = 'SegmentRemoval/Closing/'
 Closing2Folder = 'SegmentRemoval/Closing2/'
 DilateFolder = 'SegmentRemoval/Dilate/'
@@ -61,6 +62,7 @@ def RemoveSegments(fileName):
     se1 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
     mask = cv2.morphologyEx(img_bw, cv2.MORPH_CLOSE, se1) # close
     cv2.imwrite(Closing2Folder + fileName, mask)
+    return fileName
 
     #mask = (np.dstack([mask, mask, mask]) / 255).astype(np.uint8)
     #out = image_cleaned.astype(np.uint8) * mask
@@ -69,4 +71,4 @@ def RemoveSegments(fileName):
     #cv2.destroyAllWindows()
     #cv2.imwrite(Final + fileName, out)
 
-RemoveSegments('19_pred.png')
+#RemoveSegments('19_pred.png')

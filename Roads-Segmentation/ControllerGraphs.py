@@ -1,23 +1,22 @@
 import flask
-import DNNPredict
+import U_net_predict_given
 import GraphFromSkeletonize
+import SegmentsRemove
 import json
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
 
-@app.route('/segment/<filename>', methods=['GET'])
-def segmentRoads(filename):
-    classifier = DNNPredict.DnnClassifier()
-    resultFilename = classifier.predict(filename)
-
-    return resultFilename
-
-@app.route('/shortestPath/<filename>', methods=['POST'])
-def shortestPath(filename):
+@app.route('/shortestPath', methods=['POST'])
+def shortestPath():
+    data = flask.request.json
+    filename = data['fileName']
+    predictedName = U_net_predict_given.Predict(filename)
+    processed = SegmentsRemove.RemoveSegments(predictedName)
     serv = GraphFromSkeletonize.Graph()
-    result = serv.GetGraphFromImage(filename)
+    result = serv.GetPathImage(processed, int(data['y1']), int(data['x1']), int(data['y2']), int(data['x2']))
+
     print(result)
     return result
 

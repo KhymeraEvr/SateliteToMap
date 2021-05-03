@@ -10,3 +10,5 @@ Roads-Segmentation/Dataset_test.h5
 Roads-Segmentation/weights.h5
 Roads-Segmentation/modelWeights.h5
 Roads-Segmentation/finalModel.hdf5
+Roads-Segmentation/__pycache__
+Roads-Segmentation/__pycache__
