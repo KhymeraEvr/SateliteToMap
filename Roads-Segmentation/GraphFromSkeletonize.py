@@ -175,7 +175,9 @@ class Graph:
         image_from_plot = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
         image_from_plot = image_from_plot.reshape(fig.canvas.get_width_height()[::-1] + (3,))
         im = Image.fromarray(image_from_plot)
-        im.save('Graphs/Paths/' + fileName)
+        im_crop = im.crop((80, 0, 560, 480))
+        im_crop.save('Graphs/Paths/' + fileName)
+        im_crop.save('../ImageGraph/ImageGraph/wwwroot/' + fileName)
         # draw image
         # plt.imshow(binary, cmap='gray')
 

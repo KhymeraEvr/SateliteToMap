@@ -10,7 +10,7 @@ app.config["DEBUG"] = True
 resizedImageSize = 256
 def normalizeCors(cor, maxV):
     corF = float(cor)
-    res = 256 / maxV * corF
+    res = 256 / float(maxV) * corF
     return res
 
 

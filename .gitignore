@@ -12,3 +12,12 @@ Roads-Segmentation/modelWeights.h5
 Roads-Segmentation/finalModel.hdf5
 Roads-Segmentation/__pycache__
 Roads-Segmentation/__pycache__
+.idea
+ImageGraph/.vs
+ImageGraph/ImageGraph/bin/Debug
+ImageGraph/ImageGraph/obj
+venv
+venv
+Roads-Segmentation/SegmentRemoval
+Roads-Segmentation/Predictions
+Roads-Segmentation/Graphs

@@ -1,0 +1,231 @@
+﻿@{
+   ViewData["Title"] = "Home Page";
+}
+
+<head>
+   <meta charset="utf-8">
+   <title>Satellite Navigator</title>
+   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+   <!-- UIkit CSS -->
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.6.21/dist/css/uikit.min.css" />
+
+   <!-- UIkit JS -->
+   <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.21/dist/js/uikit.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.21/dist/js/uikit-icons.min.js"></script>
+   <script>
+      function FindPosition(oElement) {
+         if (typeof (oElement.offsetParent) != "undefined") {
+            for (var posX = 0, posY = 0; oElement; oElement = oElement.offsetParent) {
+               posX += oElement.offsetLeft;
+               posY += oElement.offsetTop;
+            }
+            return [posX, posY];
+         }
+         else {
+            return [oElement.x, oElement.y];
+         }
+      }
+
+      function GetCoordinates(e) {
+         var PosX = 0;
+         var PosY = 0;
+         var ImgPos;
+         ImgPos = FindPosition(myImg);
+         if (!e) var e = window.event;
+         if (e.pageX || e.pageY) {
+            PosX = e.pageX;
+            PosY = e.pageY;
+         }
+         else if (e.clientX || e.clientY) {
+            PosX = e.clientX + document.body.scrollLeft
+               + document.documentElement.scrollLeft;
+            PosY = e.clientY + document.body.scrollTop
+               + document.documentElement.scrollTop;
+         }
+         PosX = PosX - ImgPos[0];
+         PosY = PosY - ImgPos[1];
+         if (point2) {
+            document.getElementById("x2").innerHTML = PosX;
+            document.getElementById("y2").innerHTML = PosY;
+         }
+         else {
+            document.getElementById("x").innerHTML = PosX;
+            document.getElementById("y").innerHTML = PosY;
+            }
+        
+      }
+
+      function previewFile(input) {
+         var file = $("input[type=file]").get(0).files[0];
+
+         if (file) {
+            var reader = new FileReader();
+
+            reader.onload = function () {
+               $("#myImgId").attr("src", reader.result);
+            }
+
+            reader.readAsDataURL(file);
+         }
+      }
+
+      function sendFile() {
+         var photo = document.getElementById("file").files[0];
+         var formData = new FormData();
+     
+         formData.append("file", photo);
+         fetch('/file', { method: "POST", body: formData });
+         getPath();
+      }
+
+      $(document).ready(function () {
+         $("#myImgId").click(function (e) {
+            if (!point2) {
+               $('img[src*="/2703060-64.png"]').remove();
+            }
+            point2 = !point2
+            e.preventDefault();
+            var PosX = 0;
+            var PosY = 0;
+            var ImgPos;
+            ImgPos = FindPosition(myImg);
+            if (!e) var e = window.event;
+            if (e.pageX || e.pageY) {
+               PosX = e.pageX;
+               PosY = e.pageY;
+            }
+            else if (e.clientX || e.clientY) {
+               PosX = e.clientX + document.body.scrollLeft
+                  + document.documentElement.scrollLeft;
+               PosY = e.clientY + document.body.scrollTop
+                  + document.documentElement.scrollTop;
+            }
+            var x = PosX - ImgPos[0];
+            var y = PosY - ImgPos[1];
+            var img = $('<img>');
+            img.css('top', y - 20);
+            img.css('left', x - 10);
+            img.attr('width', 20);
+            img.attr('height', 20);
+            img.addClass("image2");
+            img.attr('src', '/2703060-64.png');
+            img.appendTo('#maping');
+         })
+      });
+
+      $(document).ready(function () {
+         $("#file").click(function (e) {
+            console.log('removing');
+            $('img[src*="/2703060-64.png"]').remove();
+         })
+      });
+
+      var point2 = false;
+
+      function getPath() {
+         var x = document.getElementById("x").innerHTML;
+         var y = document.getElementById("y").innerHTML;
+         var x2 = document.getElementById("x2").innerHTML;
+         var y2 = document.getElementById("y2").innerHTML;
+     
+         var myImg = document.getElementById("myImgId");
+         var fullPath = document.getElementById('file').value;
+         var filename = "";
+         if (fullPath) {
+            var startIndex = (fullPath.indexOf('\\') >= 0 ? fullPath.lastIndexOf('\\') : fullPath.lastIndexOf('/'));
+            filename = fullPath.substring(startIndex);
+            if (filename.indexOf('\\') === 0 || filename.indexOf('/') === 0) {
+               filename = filename.substring(1);
+            }
+         }
+
+         var realWidth = myImg.clientWidth;
+         var realHeight = myImg.clientHeight;
+         var dat = JSON.stringify({
+            "X1": x,
+            "Y1": y,
+            "X2": x2,
+            "Y2": y2,
+            "MaxX": realWidth,
+            "MaxY": realHeight,
+            "FileName": filename
+         });
+
+         $.ajax({
+            type: 'POST',
+            url: "path",
+            data: dat,
+            contentType: "application/json",
+            success: function (result) {
+               console.log(result);
+               if(result){
+                  $("#outPutId").attr("src", result);
+               }
+            },
+            error: function (data) {
+               console.log(data);
+            }
+         });
+      }
+   </script>
+</head>
+
+<div class="uk-flex">
+   <div class="uk-card uk-card-default uk-card-body">
+      <div id="maping" class="parent">
+         <img id="myImgId" class="image1" alt="" width="500" />
+      </div>
+   </div>
+   <div class="uk-card uk-card-default uk-card-body uk-margin-left">
+      <div style="display: flex;">
+         <div style="width: 50%;">
+            <p>X1:<span id="x"></span></p>
+            <p>Y1:<span id="y"></span></p>
+         </div>
+         <div style="width: 50%;">
+            <p>X2:<span id="x2"></span></p>
+            <p>Y2:<span id="y2"></span></p>
+         </div>
+
+      </div>
+
+      <div>
+         <p>
+            <input type="file" id="file" name="file" onchange="previewFile(this);">
+            <button class="btn btn-success" onclick="sendFile();">Save</button>
+         </p>
+      </div>
+   </div>
+   <div class="uk-card uk-card-default uk-card-body uk-margin-left">
+      <div id="mapingOutput">
+         <img id="outPutId" width="500" />
+      </div>
+   </div>
+</div>
+
+<script type="text/javascript">
+   <!--
+   var myImg = document.getElementById("myImgId");
+   myImg.onmousedown = GetCoordinates;
+//-->
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+<style>
+   .parent {
+      position: relative;
+      top: 0;
+      left: 0;
+   }
+
+   .image1 {
+      position: relative;
+      border: 1px red solid;
+   }
+
+   .image2 {
+      position: absolute;
+   }
+</style>
