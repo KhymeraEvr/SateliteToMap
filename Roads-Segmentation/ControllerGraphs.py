@@ -7,6 +7,12 @@ import json
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
+resizedImageSize = 256
+def normalizeCors(cor, maxV):
+    corF = float(cor)
+    res = 256 / maxV * corF
+    return res
+
 
 @app.route('/shortestPath', methods=['POST'])
 def shortestPath():
@@ -15,7 +21,13 @@ def shortestPath():
     predictedName = U_net_predict_given.Predict(filename)
     processed = SegmentsRemove.RemoveSegments(predictedName)
     serv = GraphFromSkeletonize.Graph()
-    result = serv.GetPathImage(processed, int(data['y1']), int(data['x1']), int(data['y2']), int(data['x2']))
+    maxY = data['maxY']
+    maxX = data['maxX']
+    y1 = normalizeCors(data['y1'], maxY)
+    y2 = normalizeCors(data['y2'], maxY)
+    x1 = normalizeCors(data['x1'], maxX)
+    x2 = normalizeCors(data['x2'], maxX)
+    result = serv.GetPathImage(processed, y1, x1, y2, x2)
 
     print(result)
     return result

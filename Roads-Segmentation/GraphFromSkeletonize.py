@@ -206,14 +206,14 @@ class Graph:
         return fileName
 
 
-serv = Graph()
-fileName = "34_pred.png";
-g = serv.GetGraphFromImage(fileName)
-serv.DrawGraph(g,fileName);
-
-node1 = serv.FindNodeByXY(g, 36, 27)[0]
-print("point1 = " +str(node1))
-node2 = serv.FindNodeByXY(g, 229, 220)[0]
-print("point2 = " +str(node2))
-path = serv.FindPath(g,node1[0],node2[0])
-serv.DrawPath(g,path, fileName)
+#serv = Graph()
+#fileName = "34_pred.png";
+#g = serv.GetGraphFromImage(fileName)
+#serv.DrawGraph(g,fileName);
+#
+#node1 = serv.FindNodeByXY(g, 36, 27)[0]
+#print("point1 = " +str(node1))
+#node2 = serv.FindNodeByXY(g, 229, 220)[0]
+#print("point2 = " +str(node2))
+#path = serv.FindPath(g,node1[0],node2[0])
+#serv.DrawPath(g,path, fileName)
