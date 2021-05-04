@@ -4,18 +4,20 @@ from skimage.morphology import erosion, dilation, opening, closing, white_tophat
 from skimage.morphology import black_tophat, skeletonize, convex_hull_image
 from skimage.morphology import disk
 
-img=cv2.imread('DilateImput/output2.png')
+img=cv2.imread('DilateImput/cleaned_025.png')
 img_bw = 255*(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) > 5).astype('uint8')
-cv2.imwrite('DilateImput/out/outputBW.png', eroded)
-selem = disk(3)
-eroded = erosion(img_bw, selem)
-cv2.imwrite('DilateImput/out/outputBW.png', eroded)
-img_bw = eroded
 
-se1 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9,9))
-se2 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3,3))
+kernel = np.ones((3,3),np.uint8)
+dilation = cv2.dilate(img_bw,kernel,iterations = 1)
+cv2.imwrite('DilateImput/out/dilation.png', dilation)
+img_bw = dilation
+
+se1 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3,3))
+se2 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (1,1))
 mask = cv2.morphologyEx(img_bw, cv2.MORPH_CLOSE, se1)
-mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, se2)
+#mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, se2)
+cv2.imwrite('DilateImput/out/ou2.png', mask)
+
 
 mask = np.dstack([mask, mask, mask]) / 255
 out = img * mask

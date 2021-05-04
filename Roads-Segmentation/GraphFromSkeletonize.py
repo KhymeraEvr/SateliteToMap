@@ -8,6 +8,7 @@ import numpy as np
 import networkx as nx
 
 inputImagePath = 'Graphs/input/'
+Closing2Folder = 'SegmentRemoval/Closing2/'
 outputImagePath = 'Graphs/output/'
 poitSearchTreshhold = 10
 
@@ -40,11 +41,30 @@ class Graph:
         fig.tight_layout()
         plt.show()
 
+    def SaveSkeleton(self, image, ske, fileName):
+        # display results
+        fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(8, 4),
+                                 sharex=True, sharey=True)
+
+        ax = axes.ravel()
+
+        ax[0].imshow(image, cmap=plt.cm.gray)
+        ax[0].axis('off')
+        ax[0].set_title('original', fontsize=20)
+
+        ax[1].imshow(ske, cmap=plt.cm.gray)
+        ax[1].axis('off')
+        ax[1].set_title('skeleton', fontsize=20)
+
+        fig.tight_layout()
+        plt.savefig('Graphs/Skeletons/' + fileName)
+
     def GetGraphFromImage(self, imageFileName):
         # open and skeletonize
-        filePath = inputImagePath + imageFileName;
-        img = imread(filePath)
-
+        filePath = Closing2Folder + imageFileName;
+        img24bit = imread(filePath)
+        img =  np.array(Image.fromarray(img24bit).quantize(colors=2, method=2))
+        # self.Show(img)
 
         binary = img > filters.threshold_otsu(img,100)
 
@@ -53,10 +73,8 @@ class Graph:
         self.binaryImg = binary
         ske = skeletonize(binary).astype(np.uint16)
 
-        im = Image.fromarray(ske)
-        im.save("your_file.tiff")
-
-        self.ShowSkeleton(img,ske)
+        #self.ShowSkeleton(img,ske)
+        self.SaveSkeleton(img, ske, imageFileName)
 
         # build graph from skeleton
         graph = sknw.build_sknw(ske)
@@ -65,6 +83,7 @@ class Graph:
 
     def FindNodeByXY(self, graph, X, Y):
         results = []
+        print("Searching X: " + str(X) + "  Y: " + str(Y))
         for pts in graph.nodes.items():
             for x,y in pts[1]['pts']:
                 xD = abs(x - X);
@@ -84,9 +103,9 @@ class Graph:
         path = nx.shortest_path(graph, nodeA, nodeB, weight='weight');
         return path;
 
-    def DrawGraph(self, graph):
+    def DrawGraph(self, graph, fileName):
         # draw image
-        plt.imshow(self.binaryImg, cmap='gray')
+        #plt.imshow(self.binaryImg, cmap='gray')
 
         # draw edges by pts
         for (s,e) in graph.edges():
@@ -105,9 +124,11 @@ class Graph:
 
         # title and show
         plt.title('Build Graph')
-        plt.show()
+        plt.savefig('Graphs/Graphs/' + fileName)
+        #plt.show()
 
-    def DrawPath(self, graph, path):
+    def DrawPath(self, graph, path, fileName):
+        fig, ax = plt.subplots()
         plt.imshow(self.binaryImg, cmap='gray')
 
         # draw edges by pts
@@ -123,14 +144,14 @@ class Graph:
         #plt.plot(ps[:, 1], ps[:, 0], 'r.')
 
         for nd in nodes:
-           if (nd == 276) | (nd == 1138):
-               nodePoint = self.FindNodeById(g, nd)
+           if (nd == path[0]) | (nd == path[-1]):
+               nodePoint = self.FindNodeById(graph, nd)
                plt.plot(nodePoint[1]['o'][1], nodePoint[1]['o'][0], 'r.')
                #plt.annotate(nd, (nodePoint[1]['o'][1], nodePoint[1]['o'][0]), color='white')
 
         pathNodes = []
         for pathNd in path:
-            pathPoint = self.FindNodeById(g, pathNd)
+            pathPoint = self.FindNodeById(graph, pathNd)
             pathNodes.append(pathPoint[1])
             plt.plot(pathPoint[1]['o'][1], pathPoint[1]['o'][0], 'blue')
             # plt.annotate(pathPoint[0], (pathPoint[1]['o'][1], pathPoint[1]['o'][0]), color='white')
@@ -140,9 +161,21 @@ class Graph:
 
 
         # title and show
-        plt.title('Build Graph')
-        plt.show()
+        #plt.savefig('Graphs/Paths/' + fileName)
+        #plt.show()
+        # Image from plot
+        ax.axis('off')
+        fig.tight_layout(pad=0)
 
+        # To remove the huge white borders
+        ax.margins(0)
+
+        fig.canvas.draw()
+        plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
+        image_from_plot = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
+        image_from_plot = image_from_plot.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+        im = Image.fromarray(image_from_plot)
+        im.save('Graphs/Paths/' + fileName)
         # draw image
         # plt.imshow(binary, cmap='gray')
 
@@ -160,13 +193,27 @@ class Graph:
         # plt.title('Build Graph')
         # plt.show()
 
-serv = Graph()
-g = serv.GetGraphFromImage("outMed.jpg")
-serv.DrawGraph(g);
+    def GetPathImage(self, fileName, cors1x, cors1y, cors2x, cors2y):
+        g = self.GetGraphFromImage(fileName)
+        self.DrawGraph(g, fileName);
 
-node1 = serv.FindNodeByXY(g, 385, 231)[0]
-print("point1 = " +str(node1))
-node2 = serv.FindNodeByXY(g, 907, 404)[0]
-print("point2 = " +str(node2))
-path = serv.FindPath(g,node1[0],node2[0])
-serv.DrawPath(g,path)
+        node1 = self.FindNodeByXY(g, cors1x, cors1y)[0]
+        print("point1 = " + str(node1))
+        node2 = self.FindNodeByXY(g, cors2x, cors2y)[0]
+        print("point2 = " + str(node2))
+        path = self.FindPath(g, node1[0], node2[0])
+        self.DrawPath(g, path, fileName)
+        return fileName
+
+
+#serv = Graph()
+#fileName = "34_pred.png";
+#g = serv.GetGraphFromImage(fileName)
+#serv.DrawGraph(g,fileName);
+#
+#node1 = serv.FindNodeByXY(g, 36, 27)[0]
+#print("point1 = " +str(node1))
+#node2 = serv.FindNodeByXY(g, 229, 220)[0]
+#print("point2 = " +str(node2))
+#path = serv.FindPath(g,node1[0],node2[0])
+#serv.DrawPath(g,path, fileName)
