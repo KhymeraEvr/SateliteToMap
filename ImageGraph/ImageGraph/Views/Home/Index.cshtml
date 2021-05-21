@@ -74,8 +74,9 @@
          var formData = new FormData();
      
          formData.append("file", photo);
-         fetch('/file', { method: "POST", body: formData });
-         getPath();
+         fetch('/file', { method: "POST", body: formData })
+            .then(data => console.log(data))
+            .then(getPath());
       }
 
       $(document).ready(function () {
