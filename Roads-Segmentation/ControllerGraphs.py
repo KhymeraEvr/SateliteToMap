@@ -23,6 +23,9 @@ def shortestPath():
     serv = GraphFromSkeletonize.Graph()
     maxY = data['maxY']
     maxX = data['maxX']
+    points = data['cors']
+    for point in points:
+        point.X = normalizeCors(pointX, maxY)
     y1 = normalizeCors(data['y1'], maxY)
     y2 = normalizeCors(data['y2'], maxY)
     x1 = normalizeCors(data['x1'], maxX)

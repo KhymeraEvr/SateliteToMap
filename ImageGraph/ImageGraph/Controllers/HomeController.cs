@@ -30,7 +30,8 @@ namespace ImageGraph.Controllers
       [HttpPost( "path" )]
       public async Task<IActionResult> ShortestPath( [FromBody] object data )
       {
-         var model = JsonConvert.DeserializeObject<ShortestPathModel>( data.ToString() );
+         var dataString = data.ToString();
+         var model = JsonConvert.DeserializeObject<ShortestPathModel>(dataString);
 
          var body = new
          {

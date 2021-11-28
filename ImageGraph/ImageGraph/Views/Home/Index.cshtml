@@ -44,15 +44,16 @@
          }
          PosX = PosX - ImgPos[0];
          PosY = PosY - ImgPos[1];
-         if (point2) {
-            document.getElementById("x2").innerHTML = PosX;
-            document.getElementById("y2").innerHTML = PosY;
-         }
-         else {
-            document.getElementById("x").innerHTML = PosX;
-            document.getElementById("y").innerHTML = PosY;
-            }
-        
+
+         var cors = JSON.parse(localStorage.getItem("cors"));
+         var point = {
+            x : PosX,
+            y : PosY
+         };
+
+         if(cors == null) cors = []
+         cors.push(point);
+         localStorage.setItem("cors", JSON.stringify(cors));
       }
 
       function previewFile(input) {
@@ -124,11 +125,8 @@
       var point2 = false;
 
       function getPath() {
-         var x = document.getElementById("x").innerHTML;
-         var y = document.getElementById("y").innerHTML;
-         var x2 = document.getElementById("x2").innerHTML;
-         var y2 = document.getElementById("y2").innerHTML;
-     
+         var cors = JSON.parse(localStorage.getItem("cors"));
+
          var myImg = document.getElementById("myImgId");
          var fullPath = document.getElementById('file').value;
          var filename = "";
@@ -143,10 +141,7 @@
          var realWidth = myImg.clientWidth;
          var realHeight = myImg.clientHeight;
          var dat = JSON.stringify({
-            "X1": x,
-            "Y1": y,
-            "X2": x2,
-            "Y2": y2,
+            "cors": cors,
             "MaxX": realWidth,
             "MaxY": realHeight,
             "FileName": filename
@@ -180,14 +175,9 @@
    <div class="uk-card uk-card-default uk-card-body uk-margin-left">
       <div style="display: flex;">
          <div style="width: 50%;">
-            <p>X1:<span id="x"></span></p>
-            <p>Y1:<span id="y"></span></p>
+            <p>X:<span id="x"></span></p>
+            <p>Y:<span id="y"></span></p>
          </div>
-         <div style="width: 50%;">
-            <p>X2:<span id="x2"></span></p>
-            <p>Y2:<span id="y2"></span></p>
-         </div>
-
       </div>
 
       <div>
