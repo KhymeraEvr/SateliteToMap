@@ -1,4 +1,6 @@
-﻿namespace ImageGraph.Models
+﻿using System.Collections.Generic;
+
+namespace ImageGraph.Models
 {
    public class ShortestPathModel
    {
@@ -9,6 +11,8 @@
       public string MaxY { get; set; }
 
       public string FileName { get; set; }
+
+      public double? Scale { get; set; }
    }
 
    public class Point

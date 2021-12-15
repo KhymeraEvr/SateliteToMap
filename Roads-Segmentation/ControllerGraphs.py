@@ -10,7 +10,8 @@ app.config["DEBUG"] = True
 resizedImageSize = 256
 def normalizeCors(cor, maxV):
     corF = float(cor)
-    res = 256 / maxV * corF
+    maxF = float(maxV)
+    res = 256 / maxF * corF
     return res
 
 
@@ -23,14 +24,18 @@ def shortestPath():
     serv = GraphFromSkeletonize.Graph()
     maxY = data['maxY']
     maxX = data['maxX']
-    points = data['cors']
-    for point in points:
-        point.X = normalizeCors(pointX, maxY)
-    y1 = normalizeCors(data['y1'], maxY)
-    y2 = normalizeCors(data['y2'], maxY)
-    x1 = normalizeCors(data['x1'], maxX)
-    x2 = normalizeCors(data['x2'], maxX)
-    result = serv.GetPathImage(processed, y1, x1, y2, x2)
+    cors = data['cors']
+
+    print(data);
+    points = [];
+    for cor in cors:
+        print(cor['X'])
+        normX = normalizeCors(cor['Y'], maxX)
+        normY = normalizeCors(cor['X'], maxY)
+        point = GraphFromSkeletonize.Point(normX, normY)
+        points.append(point)
+
+    result = serv.GetPathImage(processed, points)
 
     print(result)
     return result

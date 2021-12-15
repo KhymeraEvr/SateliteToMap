@@ -16,3 +16,6 @@ Roads-Segmentation/__pycache__
 ImageGraph/.vs
 ImageGraph/ImageGraph/bin
 ImageGraph/ImageGraph/obj
+
+Roads-Segmentation/Graphs
+Roads-Segmentation/SegmentRemoval

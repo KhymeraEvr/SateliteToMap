@@ -12,6 +12,15 @@ Closing2Folder = 'SegmentRemoval/Closing2/'
 outputImagePath = 'Graphs/output/'
 poitSearchTreshhold = 10
 
+class Point:
+    x = 0
+    y = 0
+
+    def __init__(self, X, Y):
+        self.x = X
+        self.y = Y
+
+
 class Graph:
     binaryImg = None;
 
@@ -101,7 +110,12 @@ class Graph:
 
     def FindPath(self, graph, nodeA,nodeB):
         path = nx.shortest_path(graph, nodeA, nodeB, weight='weight');
-        return path;
+        path_length = nx.shortest_path_length(graph, nodeA, nodeB, weight='weight');
+        result = {
+            "path": path,
+            "len": path_length
+        }
+        return result;
 
     def DrawGraph(self, graph, fileName):
         # draw image
@@ -125,6 +139,7 @@ class Graph:
         # title and show
         plt.title('Build Graph')
         plt.savefig('Graphs/Graphs/' + fileName)
+
         #plt.show()
 
     def DrawPath(self, graph, path, fileName):
@@ -174,8 +189,13 @@ class Graph:
         plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
         image_from_plot = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
         image_from_plot = image_from_plot.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+
+        # Cropped image of above dimension
+        # (It will not change original image)
         im = Image.fromarray(image_from_plot)
-        im.save('Graphs/Paths/' + fileName)
+        im1 = im.crop((80, 0, 560, 480))
+
+        im1.save('../ImageGraph/ImageGraph/wwwroot/' + fileName)
         # draw image
         # plt.imshow(binary, cmap='gray')
 
@@ -201,16 +221,46 @@ class Graph:
         print("point1 = " + str(node1))
         node2 = self.FindNodeByXY(g, cors2x, cors2y)[0]
         print("point2 = " + str(node2))
-        path = self.FindPath(g, node1[0], node2[0])
-        self.DrawPath(g, path, fileName)
+        pathRes = self.FindPath(g, node1[0], node2[0])
+        self.DrawPath(g, pathRes["path"], fileName)
         return fileName
 
+    def GetPathImage(self, fileName, points):
+        g = self.GetGraphFromImage(fileName)
+        self.DrawGraph(g, fileName);
+        resultFile = 'Graphs/Graphs/' + fileName;
+
+        path = [];
+        pathLength = 0;
+        iters = len(points) - 1;
+        for i in range(iters):
+            j = i;
+            node1 = self.FindNodeByXY(g, points[j].x, points[j].y)[0]
+            print("point1 = " + str(node1))
+            node2 = self.FindNodeByXY(g, points[1+j].x, points[1+j].y)[0]
+            print("point2 = " + str(node2))
+            pathRes = self.FindPath(g, node1[0], node2[0])
+            path = path + pathRes["path"]
+            pathLength = pathRes["len"];
+
+        self.DrawPath(g, path, fileName)
+
+        result = {
+            "img": fileName,
+            "len": pathLength
+        }
+        return result
+
+
+#points = [ Point(36, 27), Point(229, 220), Point(229, 37) ]
 
 #serv = Graph()
 #fileName = "34_pred.png";
 #g = serv.GetGraphFromImage(fileName)
 #serv.DrawGraph(g,fileName);
-#
+
+
+#serv.GetPathImage(fileName, points);
 #node1 = serv.FindNodeByXY(g, 36, 27)[0]
 #print("point1 = " +str(node1))
 #node2 = serv.FindNodeByXY(g, 229, 220)[0]

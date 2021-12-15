@@ -45,10 +45,13 @@
          PosX = PosX - ImgPos[0];
          PosY = PosY - ImgPos[1];
 
+         document.getElementById("x").innerHTML = PosX;
+         document.getElementById("y").innerHTML = PosY;
+         document.getElementById("points").innerHTML = parseInt(document.getElementById("points").innerHTML,10) + 1;
          var cors = JSON.parse(localStorage.getItem("cors"));
          var point = {
-            x : PosX,
-            y : PosY
+            X : PosX,
+            Y : PosY
          };
 
          if(cors == null) cors = []
@@ -57,6 +60,7 @@
       }
 
       function previewFile(input) {
+         localStorage.clear();
          var file = $("input[type=file]").get(0).files[0];
 
          if (file) {
@@ -78,6 +82,11 @@
          fetch('/file', { method: "POST", body: formData })
             .then(data => console.log(data))
             .then(getPath());
+      }
+
+      function clearPoints() {
+         localStorage.clear();
+         document.getElementById("points").innerHTML = 0;
       }
 
       $(document).ready(function () {
@@ -126,6 +135,7 @@
 
       function getPath() {
          var cors = JSON.parse(localStorage.getItem("cors"));
+         var scale = document.getElementById("scale").value;
 
          var myImg = document.getElementById("myImgId");
          var fullPath = document.getElementById('file').value;
@@ -144,7 +154,8 @@
             "cors": cors,
             "MaxX": realWidth,
             "MaxY": realHeight,
-            "FileName": filename
+            "FileName": filename,
+            "Scale": scale
          });
 
          $.ajax({
@@ -155,7 +166,8 @@
             success: function (result) {
                console.log(result);
                if(result){
-                  $("#outPutId").attr("src", result);
+                  $("#outPutId").attr("src", result.img);
+                  document.getElementById("pathLen").innerHTML = "Довжина шляху:  " + result.len  + " м";
                }
             },
             error: function (data) {
@@ -177,14 +189,19 @@
          <div style="width: 50%;">
             <p>X:<span id="x"></span></p>
             <p>Y:<span id="y"></span></p>
+            <p>Точок: <span id="points">0</span></p>
          </div>
       </div>
 
-      <div>
+      <div style="display: flex; flex-direction: column;">
          <p>
             <input type="file" id="file" name="file" onchange="previewFile(this);">
-            <button class="btn btn-success" onclick="sendFile();">Save</button>
+            <button class="btn btn-success" onclick="sendFile();">Надіслати</button>
          </p>
+         <button style="width: 50%;" class="btn btn-success" onclick="clearPoints();">Очистити точки</button>
+         <label for="scale">Масштаб</label>
+         <input id="scale" type="text" style="width: 50%;" placeholder="3.6329">
+         <span id="pathLen"></span>
       </div>
    </div>
    <div class="uk-card uk-card-default uk-card-body uk-margin-left">
